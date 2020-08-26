@@ -52,6 +52,51 @@ You can use one of those pictures:
  - [apollo13.png](../../documents/apollo13.png) with a 90 degree rotation
  - [apollo13-summary.png](../../documents/apollo13-summary.png) which contains underlining and overlining of some text.
 
+Once you've uploaded one of the images to your S3 bucket then it will trigger an execution of your Lambda function. The logs of this execution will be shown in CloudWatch logs (as described below). You can also create a Lambda test to simulate a file being uploaded (so you don't need to constantly flip between S3/Cloudwatch/Lambda).
+
+In order to create the Lambda test, select the box next to the word "Test". In the JSON section paste the following, but make sure to replace the BUCKET NAME and KEY fields with your own bucket name and file name.
+
+```json
+{
+  "Records": [
+    {
+      "eventVersion": "2.0",
+      "eventSource": "aws:s3",
+      "awsRegion": "us-east-1",
+      "eventTime": "1970-01-01T00:00:00.000Z",
+      "eventName": "ObjectCreated:Put",
+      "userIdentity": {
+        "principalId": "EXAMPLE"
+      },
+      "requestParameters": {
+        "sourceIPAddress": "127.0.0.1"
+      },
+      "responseElements": {
+        "x-amz-request-id": "EXAMPLE123456789",
+        "x-amz-id-2": "EXAMPLE123/5678abcdefghijklambdaisawesome/mnopqrstuvwxyzABCDEFGH"
+      },
+      "s3": {
+        "s3SchemaVersion": "1.0",
+        "configurationId": "testConfigRule",
+        "bucket": {
+          "name": "<YOUR BUCKET NAME HERE>",
+          "ownerIdentity": {
+            "principalId": "EXAMPLE"
+          },
+          "arn": "arn:aws:s3:::<YOUR BUCKET NAME HERE>"
+        },
+        "object": {
+          "key": "<YOUR FILE NAME HERE>",
+          "size": 1024,
+          "eTag": "0123456789abcdef0123456789abcdef",
+          "sequencer": "0A1B2C3D4E5F678901"
+        }
+      }
+    }
+  ]
+}
+``` 
+
 If you go to [CloudWatch logs](https://console.aws.amazon.com/cloudwatch/home#logs:prefix=/aws/lambda/documentTextract), you will be able to display the output of your lambda execution. You should get a json in the following form ([details here](https://docs.aws.amazon.com/textract/latest/dg/API_DetectDocumentText.html#API_DetectDocumentText_ResponseSyntax)):
 
 ```json
